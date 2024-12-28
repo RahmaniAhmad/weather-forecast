@@ -3,8 +3,8 @@ export interface HistoricalWeather {
   data: [
     {
       datetime: string;
-      min_temp: string;
-      max_temp: string;
+      min_temp: number;
+      max_temp: number;
     }
   ];
 }

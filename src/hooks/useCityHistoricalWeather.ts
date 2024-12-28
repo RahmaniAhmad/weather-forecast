@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { HistoricalWeather } from "@/models/HistoricalWeather";
-import { getCurrentLocationHistoricalWeather } from "@/api/weatherApi";
+import { getCityHistoricalWeather } from "@/api/weatherApi";
 
-export const useCurrentLocationHistoricalWeather = (days: number) => {
+export const useCityHistoricalWeather = (city: string, days: number) => {
   const [historicalWeather, setHistoricalWeather] =
     useState<HistoricalWeather | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -12,16 +12,8 @@ export const useCurrentLocationHistoricalWeather = (days: number) => {
     const fetchWeather = async () => {
       try {
         setLoading(true);
-        const { coords } = await new Promise<GeolocationPosition>(
-          (resolve, reject) =>
-            navigator.geolocation.getCurrentPosition(resolve, reject)
-        );
 
-        const data = await getCurrentLocationHistoricalWeather(
-          coords.latitude,
-          coords.longitude,
-          days
-        );
+        const data = await getCityHistoricalWeather(city, days);
         setHistoricalWeather(data);
         setLoading(false);
       } catch {
@@ -31,7 +23,7 @@ export const useCurrentLocationHistoricalWeather = (days: number) => {
     };
 
     fetchWeather();
-  }, []);
+  }, [city, days]);
 
   return { historicalWeather, loading, error };
 };

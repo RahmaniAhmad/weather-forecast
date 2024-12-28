@@ -1,63 +1,52 @@
 "use client";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
 
-//these should be fetched by an api
-const citySuggestions = [
-  { name: "Shiraz", country: "Iran" },
-  { name: "Tehran", country: "Iran" },
-  { name: "London", country: "UK" },
-  { name: "Paris", country: "France" },
-  { name: "Berlin", country: "Germany" },
-];
+import { useCitySuggestions } from "@/hooks/useCitySuggestions";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const SearchCity = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const currentCity = searchParams.get("city");
+  const pathname = usePathname();
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [inputQuery, setInputQuery] = useState("");
+  const { suggestions, loading, searchCities } = useCitySuggestions();
 
-  const [city, setCity] = useState(currentCity);
-  const [filteredSuggestions, setFilteredSuggestions] = useState<
-    {
-      name: string;
-      country: string;
-    }[]
-  >([]);
+  const cityFromUrl = pathname?.split("/").pop() || "";
 
-  const filterCities = (query: string) => {
-    if (!query) {
-      setFilteredSuggestions([]);
-      return;
+  useEffect(() => {
+    if (cityFromUrl) {
+      setInputQuery(cityFromUrl);
+      searchCities(cityFromUrl);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cityFromUrl]);
 
-    const filtered = citySuggestions.filter((city) =>
-      city.name.toLowerCase().includes(query.toLowerCase())
-    );
-    setFilteredSuggestions(filtered);
-  };
+  useEffect(() => {
+    searchCities(inputQuery);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputQuery]);
 
   const handleCityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
-    setCity(query);
-    filterCities(query);
+    setInputQuery(query);
+    setShowSuggestions(query.length > 0);
   };
 
-  const selectSuggestion = (suggestion: string) => {
-    setCity(suggestion);
-    setFilteredSuggestions([]);
+  const handleSelectSuggestion = (suggestion: string) => {
+    setInputQuery(suggestion);
+    setShowSuggestions(false);
     router.push(`/${encodeURIComponent(suggestion)}`);
   };
 
   const hanldeClearLocation = () => {
+    setInputQuery("");
+    setShowSuggestions(false);
     router.push("/");
-    setCity("");
   };
 
   const handleSearch = () => {
-    if (city) {
-      setCity(city);
-      setFilteredSuggestions([]);
-      router.push(`/${city}`);
+    if (inputQuery) {
+      router.push(`/${encodeURIComponent(inputQuery)}`);
     }
   };
 
@@ -67,16 +56,16 @@ const SearchCity = () => {
         <input
           type="text"
           placeholder="Enter city name"
-          value={city ?? ""}
+          value={inputQuery}
           onChange={handleCityInput}
           className="p-2 border border-gray-300 dark:border-gray-700 rounded w-full mb-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900"
         />
-        {filteredSuggestions.length > 0 && (
+        {showSuggestions && (
           <ul className="absolute bg-white border dark:bg-gray-800 border-gray-300 rounded w-full mt-1 max-h-40 overflow-y-auto">
-            {filteredSuggestions.map((suggestion, index) => (
+            {suggestions.map((suggestion, index) => (
               <li
                 key={index}
-                onClick={() => selectSuggestion(suggestion.name)}
+                onClick={() => handleSelectSuggestion(suggestion.name)}
                 className="p-2 hover:bg-gray-200 dark:hover:bg-gray-900 cursor-pointer"
               >
                 {suggestion.name}, {suggestion.country}
@@ -94,10 +83,11 @@ const SearchCity = () => {
           Refresh Location
         </button>
         <button
+          disabled={loading}
           onClick={handleSearch}
           className="bg-blue-500 text-white px-4 py-2 rounded w-full md:w-auto"
         >
-          Search
+          {loading ? "Searching...." : "Search"}
         </button>
       </div>
     </div>

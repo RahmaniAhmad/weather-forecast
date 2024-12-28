@@ -14,9 +14,9 @@ type Props = {
 };
 export default function RootLayout({ children }: Props) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="space-y-2 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-        <ThemeProvider attribute="class" defaultTheme="light">
+        <ThemeProvider attribute="class" defaultTheme="system">
           <TemperatureUnitProvider>
             <div className="dark:bg-slate-950 space-x-2">
               <DarkModeToggle />

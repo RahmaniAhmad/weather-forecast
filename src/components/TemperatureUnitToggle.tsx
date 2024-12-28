@@ -13,7 +13,7 @@ const TemperatureUnitToggle = () => {
   return (
     <button
       onClick={handleToggle}
-      className="bg-blue-500 text-white px-2  rounded"
+      className="bg-gray-500 text-white px-2  rounded"
     >
       {unit === "C" ? "°F" : "°C"}
     </button>
