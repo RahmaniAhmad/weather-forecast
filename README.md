@@ -10,8 +10,11 @@ Before running the application, you need to configure the necessary environment 
 2. Add the following content to the `.env` file:
 
 NEXT_PUBLIC_FORECAST_DAYS="7"
+
 NEXT_PUBLIC_Historical_DAYS="7"
+
 NEXT_PUBLIC_BASE_API_URL="https://api.weatherbit.io/v2.0"
+
 NEXT_PUBLIC_API_KEY="d052ee2d6729440a83d85149fda6d8af"
 
 ## Getting Started
